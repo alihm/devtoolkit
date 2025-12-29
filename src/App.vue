@@ -15,6 +15,7 @@ import TimestampConverter from './components/tools/TimestampConverter.vue'
 import ColorConverter from './components/tools/ColorConverter.vue'
 import LoremIpsumGenerator from './components/tools/LoremIpsumGenerator.vue'
 import DiffViewer from './components/tools/DiffViewer.vue'
+import StringUtilities from './components/tools/StringUtilities.vue'
 import { useLocalStorage } from './composables/useLocalStorage'
 import { useTheme } from './composables/useTheme'
 import type { ToolId, Favorite } from './types'
@@ -39,7 +40,8 @@ const toolComponents = {
   'timestamp': TimestampConverter,
   'color': ColorConverter,
   'lorem': LoremIpsumGenerator,
-  'diff': DiffViewer
+  'diff': DiffViewer,
+  'string': StringUtilities
 } as const
 
 const currentComponent = computed(() => toolComponents[activeTab.value])

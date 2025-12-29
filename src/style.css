@@ -7,6 +7,17 @@
     @apply border-neutral-800;
   }
 
+  /* Remove default focus outline and border flash on buttons */
+  button {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button:focus,
+  button:focus-visible,
+  button:active {
+    outline: none !important;
+  }
+
   html {
     @apply scroll-smooth;
   }

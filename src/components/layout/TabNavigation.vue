@@ -17,7 +17,8 @@ import {
   Lock,
   Sparkles,
   ArrowLeftRight,
-  GitCompare
+  GitCompare,
+  CaseSensitive
 } from 'lucide-vue-next'
 import type { ToolId } from '../../types'
 import { TOOLS } from '../../types'
@@ -44,7 +45,8 @@ const iconMap = {
   'timestamp': Timer,
   'color': Palette,
   'lorem': Type,
-  'diff': GitCompare
+  'diff': GitCompare,
+  'string': CaseSensitive
 } as const
 
 // Group tools by category with category icons
@@ -53,7 +55,7 @@ const toolCategories = [
     id: 'formatters',
     name: 'Formatters',
     icon: FileCode,
-    tools: ['json-yaml', 'regex', 'diff'] as ToolId[]
+    tools: ['json-yaml', 'regex', 'diff', 'string'] as ToolId[]
   },
   {
     id: 'encoders',

@@ -1,4 +1,4 @@
-export type ToolId = 'json-yaml' | 'base64' | 'url-encoder' | 'regex' | 'jwt' | 'cron' | 'hash' | 'uuid' | 'timestamp' | 'color' | 'lorem' | 'diff'
+export type ToolId = 'json-yaml' | 'base64' | 'url-encoder' | 'regex' | 'jwt' | 'cron' | 'hash' | 'uuid' | 'timestamp' | 'color' | 'lorem' | 'diff' | 'string'
 
 export interface Tool {
   id: ToolId
@@ -137,5 +137,11 @@ export const TOOLS: Tool[] = [
     name: 'Diff Viewer',
     description: 'Compare text differences',
     icon: 'GitCompare'
+  },
+  {
+    id: 'string',
+    name: 'String Utilities',
+    description: 'Case, reverse, escape & more',
+    icon: 'Type'
   }
 ]
