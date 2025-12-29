@@ -14,6 +14,7 @@ import UuidGenerator from './components/tools/UuidGenerator.vue'
 import TimestampConverter from './components/tools/TimestampConverter.vue'
 import ColorConverter from './components/tools/ColorConverter.vue'
 import LoremIpsumGenerator from './components/tools/LoremIpsumGenerator.vue'
+import DiffViewer from './components/tools/DiffViewer.vue'
 import { useLocalStorage } from './composables/useLocalStorage'
 import { useTheme } from './composables/useTheme'
 import type { ToolId, Favorite } from './types'
@@ -37,7 +38,8 @@ const toolComponents = {
   'uuid': UuidGenerator,
   'timestamp': TimestampConverter,
   'color': ColorConverter,
-  'lorem': LoremIpsumGenerator
+  'lorem': LoremIpsumGenerator,
+  'diff': DiffViewer
 } as const
 
 const currentComponent = computed(() => toolComponents[activeTab.value])
