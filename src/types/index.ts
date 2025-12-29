@@ -1,4 +1,4 @@
-export type ToolId = 'json-yaml' | 'base64' | 'url-encoder' | 'regex' | 'jwt' | 'cron' | 'hash' | 'uuid' | 'timestamp' | 'color' | 'lorem' | 'diff' | 'string'
+export type ToolId = 'json-yaml' | 'base64' | 'url-encoder' | 'regex' | 'jwt' | 'cron' | 'hash' | 'uuid' | 'timestamp' | 'color' | 'lorem' | 'diff' | 'string' | 'number-base' | 'sql' | 'markdown'
 
 export interface Tool {
   id: ToolId
@@ -143,5 +143,23 @@ export const TOOLS: Tool[] = [
     name: 'String Utilities',
     description: 'Case, reverse, escape & more',
     icon: 'Type'
+  },
+  {
+    id: 'number-base',
+    name: 'Number Base',
+    description: 'Binary, Decimal, Hex, Octal',
+    icon: 'Binary'
+  },
+  {
+    id: 'sql',
+    name: 'SQL Formatter',
+    description: 'Beautify & minify SQL',
+    icon: 'Database'
+  },
+  {
+    id: 'markdown',
+    name: 'Markdown Preview',
+    description: 'Live preview & HTML export',
+    icon: 'FileText'
   }
 ]

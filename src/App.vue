@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, type Component } from 'vue'
 import AppHeader from './components/layout/AppHeader.vue'
 import TabNavigation from './components/layout/TabNavigation.vue'
 import FavoritesPanel from './components/layout/FavoritesPanel.vue'
@@ -16,6 +16,9 @@ import ColorConverter from './components/tools/ColorConverter.vue'
 import LoremIpsumGenerator from './components/tools/LoremIpsumGenerator.vue'
 import DiffViewer from './components/tools/DiffViewer.vue'
 import StringUtilities from './components/tools/StringUtilities.vue'
+import NumberBaseConverter from './components/tools/NumberBaseConverter.vue'
+import SqlFormatter from './components/tools/SqlFormatter.vue'
+import MarkdownPreview from './components/tools/MarkdownPreview.vue'
 import { useLocalStorage } from './composables/useLocalStorage'
 import { useTheme } from './composables/useTheme'
 import type { ToolId, Favorite } from './types'
@@ -28,7 +31,7 @@ useTheme()
 const activeTab = useLocalStorage<ToolId>('devtoolkit-active-tab', 'json-yaml')
 
 // Component map
-const toolComponents = {
+const toolComponents: Record<ToolId, Component> = {
   'json-yaml': JsonYamlFormatter,
   'base64': Base64Tool,
   'url-encoder': UrlEncoder,
@@ -41,8 +44,11 @@ const toolComponents = {
   'color': ColorConverter,
   'lorem': LoremIpsumGenerator,
   'diff': DiffViewer,
-  'string': StringUtilities
-} as const
+  'string': StringUtilities,
+  'number-base': NumberBaseConverter,
+  'sql': SqlFormatter,
+  'markdown': MarkdownPreview
+}
 
 const currentComponent = computed(() => toolComponents[activeTab.value])
 
