@@ -1,4 +1,4 @@
-export type ToolId = 'json-yaml' | 'base64' | 'url-encoder' | 'regex' | 'jwt' | 'cron'
+export type ToolId = 'json-yaml' | 'base64' | 'url-encoder' | 'regex' | 'jwt' | 'cron' | 'hash' | 'uuid' | 'timestamp' | 'color' | 'lorem'
 
 export interface Tool {
   id: ToolId
@@ -101,5 +101,35 @@ export const TOOLS: Tool[] = [
     name: 'Cron Explainer',
     description: 'Parse cron expressions',
     icon: 'Clock'
+  },
+  {
+    id: 'hash',
+    name: 'Hash Generator',
+    description: 'MD5, SHA-1, SHA-256 & more',
+    icon: 'Hash'
+  },
+  {
+    id: 'uuid',
+    name: 'UUID Generator',
+    description: 'Generate v1, v4, v7 UUIDs',
+    icon: 'Fingerprint'
+  },
+  {
+    id: 'timestamp',
+    name: 'Timestamp',
+    description: 'Convert Unix timestamps',
+    icon: 'Timer'
+  },
+  {
+    id: 'color',
+    name: 'Color Converter',
+    description: 'HEX, RGB, HSL & more',
+    icon: 'Palette'
+  },
+  {
+    id: 'lorem',
+    name: 'Lorem Ipsum',
+    description: 'Generate placeholder text',
+    icon: 'Type'
   }
 ]

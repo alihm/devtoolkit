@@ -9,6 +9,11 @@ import UrlEncoder from './components/tools/UrlEncoder.vue'
 import RegexTester from './components/tools/RegexTester.vue'
 import JwtDecoder from './components/tools/JwtDecoder.vue'
 import CronExplainer from './components/tools/CronExplainer.vue'
+import HashGenerator from './components/tools/HashGenerator.vue'
+import UuidGenerator from './components/tools/UuidGenerator.vue'
+import TimestampConverter from './components/tools/TimestampConverter.vue'
+import ColorConverter from './components/tools/ColorConverter.vue'
+import LoremIpsumGenerator from './components/tools/LoremIpsumGenerator.vue'
 import { useLocalStorage } from './composables/useLocalStorage'
 import { useTheme } from './composables/useTheme'
 import type { ToolId, Favorite } from './types'
@@ -27,7 +32,12 @@ const toolComponents = {
   'url-encoder': UrlEncoder,
   'regex': RegexTester,
   'jwt': JwtDecoder,
-  'cron': CronExplainer
+  'cron': CronExplainer,
+  'hash': HashGenerator,
+  'uuid': UuidGenerator,
+  'timestamp': TimestampConverter,
+  'color': ColorConverter,
+  'lorem': LoremIpsumGenerator
 } as const
 
 const currentComponent = computed(() => toolComponents[activeTab.value])
