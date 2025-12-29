@@ -13,28 +13,40 @@ export interface ParseResult {
 export function detectFormat(input: string): Format | null {
   const trimmed = input.trim()
 
-  // Check for JSON indicators
+  // Check for JSON indicators first
   if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
     try {
       JSON.parse(trimmed)
       return 'json'
     } catch {
-      // Could still be YAML
+      // Starts with { or [ but isn't valid JSON - reject it
+      return null
     }
   }
 
-  // Try to parse as YAML (YAML is a superset of JSON)
-  try {
-    const parsed = yaml.load(trimmed)
-    if (typeof parsed === 'object' && parsed !== null) {
-      // If it looks like JSON structure but isn't valid JSON, it's YAML
-      if (trimmed.includes(':') && !trimmed.startsWith('{')) {
+  // Check for YAML-specific indicators
+  // YAML arrays start with "- "
+  if (trimmed.startsWith('- ')) {
+    try {
+      const parsed = yaml.load(trimmed)
+      if (Array.isArray(parsed)) {
         return 'yaml'
       }
-      return 'json'
+    } catch {
+      return null
     }
-  } catch {
-    // Invalid format
+  }
+
+  // YAML key: value syntax
+  if (trimmed.includes(':')) {
+    try {
+      const parsed = yaml.load(trimmed)
+      if (typeof parsed === 'object' && parsed !== null) {
+        return 'yaml'
+      }
+    } catch {
+      return null
+    }
   }
 
   return null
@@ -47,16 +59,33 @@ export function parseInput(input: string): ParseResult {
     return { success: false, error: 'Empty input' }
   }
 
-  // Try JSON first
-  try {
-    const data = JSON.parse(trimmed)
-    return {
-      success: true,
-      data,
-      detectedFormat: 'json'
+  // If it looks like JSON (starts with { or [), it MUST be valid JSON
+  if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+    try {
+      const data = JSON.parse(trimmed)
+      return {
+        success: true,
+        data,
+        detectedFormat: 'json'
+      }
+    } catch (e) {
+      return {
+        success: false,
+        error: e instanceof Error ? e.message : 'Invalid JSON'
+      }
     }
-  } catch {
-    // Not JSON, try YAML
+  }
+
+  // For YAML, require explicit YAML syntax indicators
+  // YAML arrays start with "- " or YAML objects have "key: value" syntax
+  const hasYamlArraySyntax = trimmed.startsWith('- ')
+  const hasYamlObjectSyntax = /^[a-zA-Z_][a-zA-Z0-9_]*\s*:/.test(trimmed)
+
+  if (!hasYamlArraySyntax && !hasYamlObjectSyntax) {
+    return {
+      success: false,
+      error: 'Invalid format: not valid JSON or YAML syntax'
+    }
   }
 
   // Try YAML
@@ -76,7 +105,7 @@ export function parseInput(input: string): ParseResult {
   } catch (e) {
     return {
       success: false,
-      error: e instanceof Error ? e.message : 'Invalid format'
+      error: e instanceof Error ? e.message : 'Invalid YAML'
     }
   }
 }
