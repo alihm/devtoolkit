@@ -208,8 +208,8 @@ function selectRecent(value: string) {
         </template>
 
         <CodeEditor
-          :model-value="result.success ? result.output : ''"
-          :error="!result.success ? (result as { success: false; error: string }).error : undefined"
+          :model-value="result.success ? result.output || '' : ''"
+          :error="'error' in result ? result.error : ''"
           :rows="12"
           readonly
         />

@@ -35,6 +35,9 @@ sample-apps/
 volumes/
 data/
 
+# Build output
+dist/
+
 # Node modules (for testing)
 node_modules/
 npm-debug.log*
