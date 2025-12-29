@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { AlertTriangle, CheckCircle, Clock, Star, ShieldCheck, ShieldX } from 'lucide-vue-next'
+import { AlertTriangle, Clock, Star, ShieldCheck, ShieldX } from 'lucide-vue-next'
 import CodeEditor from '../shared/CodeEditor.vue'
 import ToolCard from '../shared/ToolCard.vue'
 import CopyButton from '../shared/CopyButton.vue'
-import { decodeJwt, formatJwtPayload, getJwtClaims, isValidJwtFormat } from '../../utils/jwt'
+import { decodeJwt, getJwtClaims } from '../../utils/jwt'
 import { useFavorites } from '../../composables/useFavorites'
 import { useRecentInputs } from '../../composables/useRecentInputs'
 

@@ -1,14 +1,12 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { ArrowRightLeft, Minimize2, Star, ChevronDown, FileJson, FileText } from 'lucide-vue-next'
+import { Minimize2, Star, ChevronDown, FileJson, FileText } from 'lucide-vue-next'
 import CodeEditor from '../shared/CodeEditor.vue'
 import ToolCard from '../shared/ToolCard.vue'
 import CopyButton from '../shared/CopyButton.vue'
 import { parseInput, formatAsJson, formatAsYaml, minifyJson, type Format } from '../../utils/jsonYaml'
 import { useFavorites } from '../../composables/useFavorites'
 import { useRecentInputs } from '../../composables/useRecentInputs'
-import type { Favorite } from '../../types'
-
 const { addFavorite } = useFavorites()
 const { addRecentInput, getRecentInputsByTool } = useRecentInputs()
 
@@ -60,13 +58,6 @@ function handleSaveFavorite() {
   const name = prompt('Enter a name for this favorite:')
   if (name && result.value.success) {
     addFavorite('json-yaml', name, input.value, result.value.output, { format: outputFormat.value })
-  }
-}
-
-function loadFavorite(fav: Favorite) {
-  input.value = fav.input
-  if (fav.options?.format) {
-    outputFormat.value = fav.options.format as Format
   }
 }
 
@@ -218,7 +209,7 @@ function selectRecent(value: string) {
 
         <CodeEditor
           :model-value="result.success ? result.output : ''"
-          :error="!result.success ? result.error : undefined"
+          :error="!result.success ? (result as { success: false; error: string }).error : undefined"
           :rows="12"
           readonly
         />

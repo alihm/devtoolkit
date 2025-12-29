@@ -4,7 +4,7 @@ import { Braces, Binary, Link, Regex, KeyRound, Clock } from 'lucide-vue-next'
 import type { ToolId } from '../../types'
 import { TOOLS } from '../../types'
 
-const props = defineProps<{
+defineProps<{
   activeTab: ToolId
 }>()
 

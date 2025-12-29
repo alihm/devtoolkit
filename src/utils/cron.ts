@@ -244,7 +244,7 @@ function matchesCron(date: Date, fields: string[]): boolean {
   )
 }
 
-function matchesField(value: number, pattern: string, min: number, max: number): boolean {
+function matchesField(value: number, pattern: string, _min: number, _max: number): boolean {
   if (pattern === '*') return true
 
   if (pattern.includes('/')) {

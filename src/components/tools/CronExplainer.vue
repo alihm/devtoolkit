@@ -144,7 +144,7 @@ const fieldRanges = ['0-59', '0-23', '1-31', '1-12', '0-6']
     <!-- Parts Breakdown -->
     <div v-if="result?.isValid" class="grid sm:grid-cols-5 gap-4">
       <div
-        v-for="(part, index) in result.parts"
+        v-for="part in result.parts"
         :key="part.field"
         class="p-4 bg-white dark:bg-surface-muted border-2 border-neutral-200 dark:border-neutral-800 rounded-xl"
       >

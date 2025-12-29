@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { Star, ChevronDown, Trash2, ExternalLink } from 'lucide-vue-next'
+import { Star, ChevronDown, Trash2 } from 'lucide-vue-next'
 import { useFavorites } from '../../composables/useFavorites'
 import type { ToolId, Favorite } from '../../types'
 import { TOOLS } from '../../types'

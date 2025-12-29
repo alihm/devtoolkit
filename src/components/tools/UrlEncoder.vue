@@ -164,7 +164,7 @@ function handleSaveFavorite() {
 
         <CodeEditor
           :model-value="result.success ? result.output : ''"
-          :error="!result.success ? result.error : undefined"
+          :error="!result.success ? (result as { success: false; error: string }).error : undefined"
           :rows="8"
           readonly
         />

@@ -36,7 +36,7 @@ const highlightedText = computed(() => {
   return text
 })
 
-watch([pattern, testString], ([p, t]) => {
+watch([pattern, testString], ([p]) => {
   if (p.trim()) {
     addRecentInput('regex', p)
   }

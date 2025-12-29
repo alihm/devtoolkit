@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
+import { computed } from 'vue'
 import AppHeader from './components/layout/AppHeader.vue'
 import TabNavigation from './components/layout/TabNavigation.vue'
 import FavoritesPanel from './components/layout/FavoritesPanel.vue'
