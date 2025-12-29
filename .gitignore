@@ -1,0 +1,65 @@
+# Documentation files (exclude all .md except README)
+*.md
+!README.md
+!EXAMPLES.md
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Claude Code settings
+.claude/
+
+# Logs and temporary files
+*.log
+logs/
+temp/
+tmp/
+
+# Environment files (will contain secrets)
+.env
+.env.local
+.env.*.local
+tests/integration/.env.test
+
+# Test files and directories
+test-apps/
+test-repos/
+sample-apps/
+
+# Docker volumes and test data
+volumes/
+data/
+
+# Node modules (for testing)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+
+# Ruby
+*.gem
+*.rbc
+/.config
+/coverage/
+/InstalledFiles
+/pkg/
+/spec/reports/
+/test/tmp/
+/test/version_tmp/
+/tmp/
