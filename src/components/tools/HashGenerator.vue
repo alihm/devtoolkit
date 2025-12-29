@@ -1,22 +1,30 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { Hash, Star, AlertTriangle, CheckCircle, XCircle, RefreshCw } from 'lucide-vue-next'
+import { Hash, Star, AlertTriangle, CheckCircle, XCircle, RefreshCw, Upload, FileText, X } from 'lucide-vue-next'
 import CodeEditor from '../shared/CodeEditor.vue'
 import ToolCard from '../shared/ToolCard.vue'
 import CopyButton from '../shared/CopyButton.vue'
-import { generateHash, generateAllHashes, compareHashes, HASH_INFO, type HashAlgorithm } from '../../utils/hash'
+import { generateHash, generateAllHashes, compareHashes, hashFile, hashAllAlgorithmsFile, formatFileSize, HASH_INFO, type HashAlgorithm, type FileHashResult } from '../../utils/hash'
 import { useFavorites } from '../../composables/useFavorites'
 import { useRecentInputs } from '../../composables/useRecentInputs'
 
 const { addFavorite } = useFavorites()
 const { addRecentInput } = useRecentInputs()
 
+type InputMode = 'text' | 'file'
+
+const inputMode = ref<InputMode>('text')
 const input = ref('')
 const selectedAlgorithm = ref<HashAlgorithm>('SHA-256')
 const currentHash = ref('')
 const allHashes = ref<Record<HashAlgorithm, { success: boolean; hash?: string; error?: string }> | null>(null)
 const isGenerating = ref(false)
 const showAllHashes = ref(false)
+
+// File hashing
+const selectedFile = ref<File | null>(null)
+const fileHashes = ref<Record<HashAlgorithm, FileHashResult> | null>(null)
+const isDragging = ref(false)
 
 // Compare mode
 const compareMode = ref(false)
@@ -32,6 +40,7 @@ const compareResult = computed(() => {
 const algorithms: HashAlgorithm[] = ['MD5', 'SHA-1', 'SHA-256', 'SHA-384', 'SHA-512']
 
 watch([input, selectedAlgorithm], async ([newInput]) => {
+  if (inputMode.value !== 'text') return
   if (!newInput.trim()) {
     currentHash.value = ''
     allHashes.value = null
@@ -56,24 +65,89 @@ watch([input, selectedAlgorithm], async ([newInput]) => {
 })
 
 watch(showAllHashes, async (show) => {
-  if (show && input.value.trim()) {
+  if (inputMode.value === 'text' && show && input.value.trim()) {
     isGenerating.value = true
     allHashes.value = await generateAllHashes(input.value)
     isGenerating.value = false
+  } else if (inputMode.value === 'file' && show && selectedFile.value) {
+    await hashSelectedFile()
   }
 })
+
+watch(inputMode, () => {
+  // Reset state when switching modes
+  currentHash.value = ''
+  allHashes.value = null
+  fileHashes.value = null
+})
+
+async function hashSelectedFile() {
+  if (!selectedFile.value) return
+
+  isGenerating.value = true
+  try {
+    if (showAllHashes.value) {
+      fileHashes.value = await hashAllAlgorithmsFile(selectedFile.value)
+      currentHash.value = fileHashes.value[selectedAlgorithm.value].hash || ''
+    } else {
+      const result = await hashFile(selectedFile.value, selectedAlgorithm.value)
+      currentHash.value = result.hash || ''
+      fileHashes.value = { [selectedAlgorithm.value]: result } as Record<HashAlgorithm, FileHashResult>
+    }
+  } finally {
+    isGenerating.value = false
+  }
+}
+
+function handleFileSelect(event: Event) {
+  const target = event.target as HTMLInputElement
+  if (target.files && target.files[0]) {
+    selectedFile.value = target.files[0]
+    hashSelectedFile()
+  }
+}
+
+function handleDrop(event: DragEvent) {
+  event.preventDefault()
+  isDragging.value = false
+  if (event.dataTransfer?.files && event.dataTransfer.files[0]) {
+    selectedFile.value = event.dataTransfer.files[0]
+    hashSelectedFile()
+  }
+}
+
+function handleDragOver(event: DragEvent) {
+  event.preventDefault()
+  isDragging.value = true
+}
+
+function handleDragLeave() {
+  isDragging.value = false
+}
+
+function clearFile() {
+  selectedFile.value = null
+  currentHash.value = ''
+  fileHashes.value = null
+}
 
 function handleSaveFavorite() {
   const name = prompt('Enter a name for this favorite:')
   if (name && currentHash.value) {
-    addFavorite('hash', name, input.value, currentHash.value, { algorithm: selectedAlgorithm.value })
+    const inputValue = inputMode.value === 'text' ? input.value : selectedFile.value?.name || ''
+    addFavorite('hash', name, inputValue, currentHash.value, { algorithm: selectedAlgorithm.value })
   }
 }
 
 function selectAlgorithm(algo: HashAlgorithm) {
   selectedAlgorithm.value = algo
-  if (allHashes.value) {
+  if (inputMode.value === 'text' && allHashes.value) {
     currentHash.value = allHashes.value[algo].hash || ''
+  } else if (inputMode.value === 'file' && fileHashes.value) {
+    currentHash.value = fileHashes.value[algo]?.hash || ''
+    if (!fileHashes.value[algo] && selectedFile.value) {
+      hashSelectedFile()
+    }
   }
 }
 </script>
@@ -82,6 +156,30 @@ function selectAlgorithm(algo: HashAlgorithm) {
   <div class="space-y-6 animate-fade-in">
     <!-- Controls -->
     <div class="flex flex-wrap items-center gap-3">
+      <!-- Input Mode Toggle -->
+      <div class="flex items-center bg-neutral-100 dark:bg-surface-elevated rounded-lg p-1">
+        <button
+          @click="inputMode = 'text'"
+          class="flex items-center gap-2 px-3 py-1.5 rounded-md font-mono text-xs transition-all duration-150"
+          :class="inputMode === 'text'
+            ? 'bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 shadow-sm'
+            : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100'"
+        >
+          <Hash class="w-3.5 h-3.5" />
+          Text
+        </button>
+        <button
+          @click="inputMode = 'file'"
+          class="flex items-center gap-2 px-3 py-1.5 rounded-md font-mono text-xs transition-all duration-150"
+          :class="inputMode === 'file'
+            ? 'bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 shadow-sm'
+            : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100'"
+        >
+          <FileText class="w-3.5 h-3.5" />
+          File
+        </button>
+      </div>
+
       <!-- Algorithm Selector -->
       <div class="flex items-center bg-neutral-100 dark:bg-surface-elevated rounded-lg p-1">
         <button
@@ -126,7 +224,7 @@ function selectAlgorithm(algo: HashAlgorithm) {
 
       <button
         @click="handleSaveFavorite"
-        :disabled="!input.trim() || !currentHash"
+        :disabled="!currentHash"
         class="flex items-center gap-2 px-3 py-1.5 rounded-lg font-mono text-sm text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <Star class="w-4 h-4" />
@@ -136,8 +234,8 @@ function selectAlgorithm(algo: HashAlgorithm) {
 
     <!-- Main Grid -->
     <div class="grid lg:grid-cols-2 gap-6">
-      <!-- Input -->
-      <ToolCard>
+      <!-- Text Input -->
+      <ToolCard v-if="inputMode === 'text'">
         <template #header>
           <div>
             <h3 class="font-display font-bold text-neutral-900 dark:text-neutral-100">Input</h3>
@@ -152,6 +250,71 @@ function selectAlgorithm(algo: HashAlgorithm) {
           placeholder="Enter text to generate hash..."
           :rows="8"
         />
+      </ToolCard>
+
+      <!-- File Input -->
+      <ToolCard v-else>
+        <template #header>
+          <div>
+            <h3 class="font-display font-bold text-neutral-900 dark:text-neutral-100">File Input</h3>
+            <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-0.5">
+              Drop a file or click to select
+            </p>
+          </div>
+        </template>
+
+        <div
+          @drop="handleDrop"
+          @dragover="handleDragOver"
+          @dragleave="handleDragLeave"
+          class="relative"
+        >
+          <!-- Drop Zone -->
+          <label
+            v-if="!selectedFile"
+            class="flex flex-col items-center justify-center h-48 border-2 border-dashed rounded-lg cursor-pointer transition-colors"
+            :class="isDragging
+              ? 'border-accent-lime bg-accent-lime/10'
+              : 'border-neutral-300 dark:border-neutral-600 hover:border-accent-lime hover:bg-neutral-50 dark:hover:bg-neutral-800'"
+          >
+            <Upload class="w-10 h-10 text-neutral-400 mb-3" />
+            <span class="text-sm font-mono text-neutral-500 dark:text-neutral-400">
+              Drop file here or click to browse
+            </span>
+            <span class="text-xs text-neutral-400 dark:text-neutral-500 mt-1">
+              Any file type supported
+            </span>
+            <input
+              type="file"
+              class="hidden"
+              @change="handleFileSelect"
+            />
+          </label>
+
+          <!-- Selected File -->
+          <div
+            v-else
+            class="flex items-center gap-4 p-4 bg-neutral-50 dark:bg-surface-elevated rounded-lg border border-neutral-200 dark:border-neutral-700"
+          >
+            <div class="flex-shrink-0 w-12 h-12 bg-accent-lime/20 rounded-lg flex items-center justify-center">
+              <FileText class="w-6 h-6 text-accent-lime" />
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="font-mono text-sm font-medium text-neutral-900 dark:text-neutral-100 truncate">
+                {{ selectedFile.name }}
+              </p>
+              <p class="text-xs text-neutral-500 dark:text-neutral-400">
+                {{ formatFileSize(selectedFile.size) }}
+              </p>
+            </div>
+            <button
+              @click="clearFile"
+              class="p-2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
+            >
+              <X class="w-5 h-5" />
+            </button>
+          </div>
+        </div>
       </ToolCard>
 
       <!-- Output -->
@@ -236,7 +399,7 @@ function selectAlgorithm(algo: HashAlgorithm) {
     </ToolCard>
 
     <!-- All Hashes -->
-    <ToolCard v-if="showAllHashes && allHashes">
+    <ToolCard v-if="showAllHashes && (allHashes || fileHashes)">
       <template #header>
         <h3 class="font-display font-bold text-neutral-900 dark:text-neutral-100">All Hash Algorithms</h3>
       </template>
@@ -258,10 +421,17 @@ function selectAlgorithm(algo: HashAlgorithm) {
                 Deprecated
               </span>
             </div>
-            <CopyButton v-if="allHashes[algo].hash" :text="allHashes[algo].hash!" size="sm" />
+            <CopyButton
+              v-if="(inputMode === 'text' ? allHashes?.[algo]?.hash : fileHashes?.[algo]?.hash)"
+              :text="(inputMode === 'text' ? allHashes?.[algo]?.hash : fileHashes?.[algo]?.hash)!"
+              size="sm"
+            />
           </div>
           <p class="font-mono text-xs text-neutral-600 dark:text-neutral-400 break-all">
-            {{ allHashes[algo].hash || allHashes[algo].error }}
+            {{ inputMode === 'text'
+              ? (allHashes?.[algo]?.hash || allHashes?.[algo]?.error || '—')
+              : (fileHashes?.[algo]?.hash || fileHashes?.[algo]?.error || '—')
+            }}
           </p>
         </div>
       </div>
