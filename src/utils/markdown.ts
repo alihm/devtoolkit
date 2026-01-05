@@ -73,12 +73,12 @@ export function markdownToHtml(markdown: string, options: Partial<MarkdownOption
   // Strikethrough
   html = html.replace(/~~(.+?)~~/g, '<del>$1</del>')
 
+  // Images (must be before links to avoid matching ![...] as a link)
+  html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1">')
+
   // Links
   const target = opts.linkTarget === '_blank' ? ' target="_blank" rel="noopener noreferrer"' : ''
   html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, `<a href="$2"${target}>$1</a>`)
-
-  // Images
-  html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1">')
 
   // Unordered lists
   html = html.replace(/^[\*\-]\s+(.+)$/gm, '<li>$1</li>')

@@ -96,9 +96,7 @@ describe('markdown utilities', () => {
 
       it('should convert images', () => {
         const result = markdownToHtml('![alt](image.jpg)')
-        // Our simple parser may convert images differently
-        expect(result).toContain('image.jpg')
-        expect(result).toContain('alt')
+        expect(result).toContain('<img src="image.jpg" alt="alt">')
       })
     })
 
